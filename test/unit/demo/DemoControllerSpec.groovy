@@ -9,6 +9,53 @@ import spock.lang.Specification
 @TestFor(DemoController)
 class DemoControllerSpec extends Specification {
 
+    void "test binding a List of List of Person to a command object"() {
+        when:
+        request.method = 'POST'
+        request.json = '''
+            {"listOfListOfPeople": [
+                    [
+                      {"firstName":"Jeff", "lastName":"Brown"},
+                      {"firstName":"Betsy", "lastName":"Brown"}
+                    ],
+                    [
+                      {"firstName":"Jeff", "lastName":"Brown"},
+                      {"firstName":"Lari", "lastName":"Hotari"},
+                      {"firstName":"Graeme", "lastName":"Rocher"}
+                    ]
+                ]
+            }
+        '''
+        def model = controller.demo2()
+        def command = model.command
+
+        then:
+        command instanceof MyOtherCommand
+        command.listOfListOfPeople instanceof List
+        command.listOfListOfPeople.size() == 2
+
+        command.listOfListOfPeople[0] instanceof List
+        command.listOfListOfPeople[0].size() == 2
+
+        command.listOfListOfPeople[0][0].firstName == 'Jeff'
+        command.listOfListOfPeople[0][0].lastName == 'Brown'
+
+        command.listOfListOfPeople[0][1].firstName == 'Betsy'
+        command.listOfListOfPeople[0][1].lastName == 'Brown'
+
+        command.listOfListOfPeople[1] instanceof List
+        command.listOfListOfPeople[1].size() == 3
+
+        command.listOfListOfPeople[1][0].firstName == 'Jeff'
+        command.listOfListOfPeople[1][0].lastName == 'Brown'
+
+        command.listOfListOfPeople[1][1].firstName == 'Lari'
+        command.listOfListOfPeople[1][1].lastName == 'Hotari'
+
+        command.listOfListOfPeople[1][2].firstName == 'Graeme'
+        command.listOfListOfPeople[1][2].lastName == 'Rocher'
+    }
+
     void "test binding a List of Map to a command object"() {
         when:
         request.method = 'POST'
